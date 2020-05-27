@@ -1,0 +1,110 @@
+﻿@page "/"
+@using Crowdfunding_API.Entities;
+@using Microsoft.VisualBasic.CompilerServices
+@using System.ComponentModel
+@using System.Net
+@inject HttpClient Http;
+@using System.Net.Http
+<h1>API Calling</h1>
+
+@if (_projects != null)
+{
+    <table>
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Account_Number</th>
+            <th>Country</th>
+            <th>Duration</th>
+            <th>Goal</th>
+            <th>UserId</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var oProject in _projects)
+        {
+            <tr>
+                <td> @oProject.Title</td>
+                <td> @oProject.Account_Number</td>
+                <td> @oProject.Country</td>
+                <td> @oProject.Duration</td>
+                <td> @oProject.Goal</td>
+                <td> @oProject.UserId</td>
+                <td>
+                    <a class="btn btn-primary editBtn" href="/editProject/@oProject.Id">Edit</a>
+                    <button class="btn btn-danger editBtn" @onclick="(() => DeleteProject(oProject))">Delete</button>
+                </td>
+            </tr>
+        }
+
+        </tbody>
+    </table>
+
+}
+
+
+
+@code{
+    private Project _project = new Project();
+    List<Project> _projects = new List<Project>();
+    Project _editProject = new Project();
+    protected override async Task OnInitializedAsync()
+    {
+        _projects = await Http.GetJsonAsync<List<Project>>("https://localhost:44338/api/projects/");
+    }
+
+    private async Task GetProjects()
+    {
+        _projects = await Http.GetJsonAsync<List<Project>>("https://localhost:44338/api/projects");
+
+    }
+
+    private async Task SaveProject()
+    {
+        _projects = await Http.PostJsonAsync<List<Project>>("https://localhost:44338/api/projects/", _project);
+    }
+
+    //private async Task EditProject()
+    //{
+    //    _projects = await Http.PutJsonAsync<List<Project>>("https://localhost:44338/api/projects/", _project);
+    //}
+
+    private async Task DeleteProject(Project oProject)
+    {
+        await Http.DeleteAsync("https://localhost:44338/api/projects/" + oProject.Id);
+        _projects.RemoveAll(x => x.Id == oProject.Id);
+    }
+
+    private void SetProjectProperties(Project oProject)
+    {
+        _project = oProject;
+    }
+
+
+        @*POST*@
+
+private async Task AddProject()
+{
+    var addProject = new Project
+    {
+        Title = _project.Title,
+        Account_Number = _project.Account_Number,
+        Country = _project.Country,
+        Duration = _project.Duration,
+        Goal = _project.Goal,
+
+
+    };
+    await Http.PostJsonAsync("https://localhost:44338/api/projects/", addProject);
+}
+
+// PUT
+private async Task EditProject(long id)
+{
+    _editProject = _projects.Single(i => i.Id == id);
+    
+    await Http.PostJsonAsync("https://localhost:44338/api/projects/", _editProject);
+}
+
+}

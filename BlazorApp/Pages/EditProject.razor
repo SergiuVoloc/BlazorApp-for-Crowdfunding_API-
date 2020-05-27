@@ -1,0 +1,45 @@
+﻿@page "/editProject/{Id:int}"
+@using Crowdfunding_API.Entities
+@inject NavigationManager NavigationManager
+@inject HttpClient Http;
+
+
+<h1>Edit Project</h1>
+
+
+@if (project == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>Title: <input type="text" @bind="project.Title" /></p>
+    <p>Account Number: <input type="text" @bind="project.Account_Number" /></p>
+    <p>Country: <input type="text" @bind="project.Country" /></p>
+    <p>Duration: <input type="text" @bind="project.Duration" /></p>
+    <p>Goal: <input type="text" @bind="project.Goal" /></p>
+    <button class="btn btn-primary" @onclick="(()=>SaveProject(project))">Save</button>
+}
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Project project;
+    protected override async Task OnInitializedAsync()
+    {
+        project = await Http.GetJsonAsync<Project>("https://localhost:44338/api/projects/" + Id);
+    }
+
+    private async Task SaveProject(Project project)
+    {
+        await Http.PutJsonAsync("https://localhost:44338/api/projects/2", project);
+
+        NavigationManager.NavigateTo("/");
+    }
+
+
+
+
+}

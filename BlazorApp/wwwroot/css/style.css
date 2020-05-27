@@ -1,0 +1,13 @@
+﻿table {
+    margin-top: 10px;
+}
+
+table th, table td {
+    border: 1px solid black;
+    margin: 10px;
+}
+
+.editBtn {
+    width: 80px;
+    margin: 0 5px 0 5px;
+}
